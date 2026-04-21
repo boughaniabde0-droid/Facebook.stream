@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>🔥 Streaming Pro</title>
+
+<style>
+body{background:#0f2027;color:white;font-family:sans-serif;text-align:center}
+input,button{padding:10px;margin:10px;border-radius:8px;border:none}
+button{background:#00c6ff;color:white;cursor:pointer}
+.card{margin-top:20px}
+</style>
+
+</head>
+<body>
+
+<h1>🚀 بث مباشر احترافي</h1>
+
+<div class="card">
+<input id="name" placeholder="اسم البث"><br>
+<input id="url" placeholder="رابط m3u8"><br>
+<input id="key" placeholder="RTMP Key"><br>
+
+<button onclick="start()">🔥 بدء البث</button>
+</div>
+
+<div id="list"></div>
+
+<script>
+
+const API = ""
+
+async function start(){
+    const name = document.getElementById('name').value
+    const url = document.getElementById('url').value
+    const streamKey = document.getElementById('key').value
+
+    await fetch(API + '/start',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({name,url,streamKey})
+    })
+
+    load()
+}
+
+async function load(){
+    const res = await fetch(API + '/streams')
+    const data = await res.json()
+
+    document.getElementById('list').innerHTML =
+        Object.keys(data).map(id=>`
+            <div>
+                🔴 ${data[id].name}
+                <button onclick="stop('${id}')">⛔</button>
+            </div>
+        `).join('')
+}
+
+async function stop(id){
+    await fetch(API + '/stop/'+id,{method:'POST'})
+    load()
+}
+
+setInterval(load,3000)
+
+</script>
+
+</body>
+</html>
